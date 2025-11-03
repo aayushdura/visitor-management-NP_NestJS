@@ -45,7 +45,7 @@
     "nodemailer": "^7.0.6",
     "oracledb": "^6.9.0",
     "reflect-metadata": "^0.2.2",
-    "rimraf": "^6.0.1",
+    "rimraf": "^6.1.0",
     "rxjs": "^7.8.2",
     "typeorm": "^0.3.26"
   },
