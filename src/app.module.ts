@@ -4,28 +4,25 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { IamModule } from './iam/iam.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import databaseConfig from './configs/db.config'
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,            // makes it available everywhere automatically
+      load: [databaseConfig],    // loads our config file above
+    }),
+
     TypeOrmModule.forRootAsync({
-      useFactory: () => ({
-        type: 'mysql',
-        host: process.env.TYPEORM_HOST,
-        port: process.env.TYPEORM_PORT
-          ? parseInt(process.env.TYPEORM_PORT, 10)
-          : 3306,
-        username: process.env.TYPEORM_USERNAME,
-        password: process.env.TYPEORM_PASSWORD,
-        database: process.env.TYPEORM_DATABASE,
-        synchronize: true,
-        entities: [__dirname + '/**/*.{model,entity}.{ts,js}'],
-        migrations: ['dist/migrations/**/*.js'],
-        subscribers: ['dist/subscriber/**/*.js'],
-        cli: {
-          migrationsDir: process.env.TYPEORM_MIGRATIONS_DIR,
-          subscribersDir: process.env.TYPEORM_SUBSCRIBERS_DIR,
-        },
-      }),
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const dbConfig = configService.get('database');
+        return {
+          ...dbConfig
+        }
+
+      },
     }),
     IamModule,
     UsersModule,
@@ -33,4 +30,4 @@ import { IamModule } from './iam/iam.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

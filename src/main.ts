@@ -10,6 +10,7 @@ import {
 import { registerFastifyPlugins } from './common/plugins/register-fastify.plugins';
 import { validateSchemaEnv } from './helpers/validation-schema-env';
 import { config } from 'dotenv';
+import { DataSource } from 'typeorm';
 
 config();
 
@@ -48,6 +49,16 @@ async function bootstrap() {
 
   const port = process.env.SERVER_PORT || 3000;
   await app.listen(port, '0.0.0.0');
+
+  
+  const dataSource = app.get(DataSource);
+
+  if (dataSource.isInitialized) {
+    console.log('✅ Connected to DB!');
+  } else {
+    console.error('❌ Database connection is not initialized');
+  }
+
   if (process.env.NODE_ENV !== 'production') {
     Logger.debug(
       `${await app.getUrl()} - Environment: ${process.env.NODE_ENV}`,
